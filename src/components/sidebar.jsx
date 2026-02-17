@@ -114,7 +114,7 @@ const Sidebar = ({ collapsed, onToggle }) => {
 							{link.icon}
 							<span
 								className={`text-xs uppercase tracking-[0.2em] text-slate-300 ${
-									collapsed ? 'block text-[10px]' : 'block'
+									collapsed ? 'hidden' : 'block'
 								}`}
 							>
 								{link.label}

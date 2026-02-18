@@ -1,8 +1,23 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 const SearchBar = () => {
+	const [query, setQuery] = useState('')
+	const navigate = useNavigate()
+
+	const handleSubmit = (e) => {
+		e.preventDefault()
+		if (query.trim()) {
+			navigate(`/search?q=${encodeURIComponent(query.trim())}`)
+		}
+	}
+
 	return (
-		<form className="group relative flex items-center">
+		<form onSubmit={handleSubmit} className="group relative flex items-center">
 			<input
 				type="text"
+				value={query}
+				onChange={(e) => setQuery(e.target.value)}
 				placeholder="Search creators, clips, or playlists"
 				className="w-full rounded-full border border-white/10 bg-slate-900/70 px-4 py-3 pr-12 text-sm text-white placeholder:text-slate-400 shadow-[0_0_30px_rgba(76,29,149,0.2)] outline-none transition focus:border-rose-300/70 focus:bg-slate-900"
 				aria-label="Search"

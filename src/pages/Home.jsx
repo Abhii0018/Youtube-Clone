@@ -1,19 +1,34 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 const Home = () => {
   const [videos, setVideos] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+
+  const page = Number(searchParams.get('page')) || 1
+  const [nextToken, setNextToken] = useState(null)
+  
+  // Store tokens for each page to enable backward navigation
+  const [tokens, setTokens] = useState({})
 
   useEffect(() => {
     const fetchVideos = async () => {
       try {
         setLoading(true)
         const apiKey = import.meta.env.VITE_API_KEY
-        const response = await fetch(
-          `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&chart=mostPopular&regionCode=US&maxResults=50&key=${apiKey}`
-        )
+        
+        // Get the page token for the current page from stored tokens
+        let pageToken = ''
+        if (page > 1 && tokens[page]) {
+          pageToken = tokens[page]
+        }
+        
+        const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&chart=mostPopular&regionCode=US&maxResults=20${pageToken ? `&pageToken=${pageToken}` : ''}&key=${apiKey}`
+        
+        const response = await fetch(url)
         
         if (!response.ok) {
           throw new Error('Failed to fetch videos')
@@ -21,6 +36,17 @@ const Home = () => {
         
         const data = await response.json()
         setVideos(data.items || [])
+        
+        // Store next page token
+        setNextToken(data.nextPageToken || null)
+        
+        // Store the next page token for future navigation
+        if (data.nextPageToken) {
+          setTokens(prev => ({
+            ...prev,
+            [page + 1]: data.nextPageToken
+          }))
+        }
       } catch (err) {
         setError(err.message)
       } finally {
@@ -29,7 +55,8 @@ const Home = () => {
     }
 
     fetchVideos()
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page])
 
   if (loading) {
     return (
@@ -52,6 +79,8 @@ const Home = () => {
       </div>
     )
   }
+
+
 
   return (
     <div className="space-y-6">
@@ -91,6 +120,29 @@ const Home = () => {
             </div>
           </Link>
         ))}
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex items-center justify-center gap-4 pb-8">
+        <button
+          onClick={() => navigate(`/?page=${page - 1}`)}
+          disabled={page === 1}
+          className="rounded-lg border border-white/10 bg-slate-900/50 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-slate-900/50"
+        >
+          ← Previous
+        </button>
+        
+        <span className="text-sm text-slate-400">
+          Page {page}
+        </span>
+        
+        <button
+          onClick={() => navigate(`/?page=${page + 1}`)}
+          disabled={!nextToken}
+          className="rounded-lg border border-white/10 bg-slate-900/50 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-slate-900/50"
+        >
+          Next →
+        </button>
       </div>
     </div>
   )

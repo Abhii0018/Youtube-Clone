@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { saveToSearchHistory } from '../utils/searchHistory'
 
 const WatchHistory = () => {
   const [history, setHistory] = useState([])
@@ -91,7 +92,10 @@ const WatchHistory = () => {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {history.map((item) => (
           <div key={`${item.videoId}-${item.timestamp}`} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-slate-950/50 transition hover:border-rose-300/40 hover:bg-slate-900/70">
-            <Link to={`/watch/${item.videoId}`}>
+            <Link 
+              to={`/watch/${item.videoId}`}
+              onClick={() => saveToSearchHistory(item.title)}
+            >
               <div className="relative aspect-video overflow-hidden">
                 <img
                   src={item.thumbnail}

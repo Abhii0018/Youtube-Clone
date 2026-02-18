@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { saveToSearchHistory } from '../utils/searchHistory'
 
 const About = () => {
   const { id } = useParams()
@@ -152,6 +153,7 @@ const About = () => {
               <Link
                 key={video.id.videoId}
                 to={`/watch/${video.id.videoId}`}
+                onClick={() => saveToSearchHistory(video.snippet.title)}
                 className="group cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-slate-950/50 transition hover:border-rose-300/40 hover:bg-slate-900/70"
               >
                 <div className="relative aspect-video overflow-hidden">

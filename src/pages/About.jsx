@@ -26,6 +26,28 @@ const About = () => {
         const videoResult = await videoResponse.json()
         setVideoData(videoResult.items?.[0] || null)
         
+        // Save to watch history
+        if (videoResult.items?.[0]) {
+          const video = videoResult.items[0]
+          const watchHistory = JSON.parse(localStorage.getItem('watchHistory')) || []
+          const historyItem = {
+            videoId: id,
+            title: video.snippet.title,
+            channelTitle: video.snippet.channelTitle,
+            thumbnail: video.snippet.thumbnails.medium.url,
+            duration: video.contentDetails?.duration?.replace('PT', '').toLowerCase() || 'N/A',
+            timestamp: new Date().toISOString()
+          }
+          
+          // Remove duplicate if exists and add to beginning, keep only last 50
+          const updatedHistory = [
+            historyItem,
+            ...watchHistory.filter(item => item.videoId !== id)
+          ].slice(0, 50)
+          
+          localStorage.setItem('watchHistory', JSON.stringify(updatedHistory))
+        }
+        
         // Fetch related videos
         const relatedResponse = await fetch(
           `https://www.googleapis.com/youtube/v3/search?part=snippet&relatedToVideoId=${id}&type=video&maxResults=10&key=${apiKey}`

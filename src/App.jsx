@@ -6,6 +6,7 @@ import Layout from './components/Layout'
 import Profile from './pages/Profile'
 import Search from './pages/Search'
 import Upload from './pages/Upload'
+import WatchHistory from './pages/WatchHistory'
 import { Routes } from 'react-router-dom'
 import './App.css'
 
@@ -20,6 +21,7 @@ function App() {
             <Route path='/upload' element={<Upload />} />
             <Route path='/profile' element={<Profile />} />
             <Route path='/search' element={<Search />} />
+            <Route path='/history' element={<WatchHistory />} />
           </Routes>
       </Layout>
     </>

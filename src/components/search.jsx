@@ -8,7 +8,19 @@ const SearchBar = () => {
 	const handleSubmit = (e) => {
 		e.preventDefault()
 		if (query.trim()) {
+			// Save to search history
+			const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || []
+			const newSearch = {
+				query: query.trim(),
+				timestamp: new Date().toISOString()
+			}
+			
+			// Add to beginning and keep only last 20 searches
+			const updatedHistory = [newSearch, ...searchHistory.filter(item => item.query !== query.trim())].slice(0, 20)
+			localStorage.setItem('searchHistory', JSON.stringify(updatedHistory))
+			
 			navigate(`/search?q=${encodeURIComponent(query.trim())}`)
+			setQuery('')
 		}
 	}
 
